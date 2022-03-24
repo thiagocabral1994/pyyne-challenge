@@ -46,4 +46,27 @@ public class BankService {
     }
     return accountBalances;
   }
+
+  public PrintTransactionsDTO listEveryBankAccountTransactions(Long accountId, Date fromDate, Date toDate) {
+    if(accountId == null || fromDate == null || toDate == null) {
+      throw new InvalidBankAccountArgumentsException();
+    }
+
+    Map<String, Collection<BankAccountTransaction>> accountTransactions = this.mapTransactionLists(accountId, fromDate, toDate);
+
+    return new PrintTransactionsDTO(accountTransactions);
+  }
+
+  private Map<String, Collection<BankAccountTransaction>> mapTransactionLists(Long accountId, Date fromDate, Date toDate) {
+    Map<String, Collection<BankAccountTransaction>> accountTransactions = new HashMap<>();
+
+    for (Map.Entry<String, BankAccountSourceAdapter> entry : this.banks.entrySet()) {
+      String bankKey = entry.getKey();
+      BankAccountSourceAdapter bankSource = entry.getValue();
+
+      accountTransactions.put(bankKey, bankSource.getTransactions(accountId, fromDate, toDate));
+    }
+
+    return accountTransactions;
+  }
 }

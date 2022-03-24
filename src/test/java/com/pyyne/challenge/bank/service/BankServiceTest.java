@@ -62,4 +62,47 @@ public class BankServiceTest {
     public void shouldThrowExceptionWhenFindingBalanceWithInvalidId() {
         assertThrows(InvalidBankAccountArgumentsException.class, () -> this.bankService.listEveryBankAccountBalance(null));
     }
+
+    @Test
+    @DisplayName("Should successfully find transactions with valid ID")
+    public void shouldSuccessfullyFindTransactions() {
+        long accountId = 1;
+        Date fromDate = new Date();
+        Date toDate = new Date();
+
+        Collection<BankAccountTransaction> bankATransactions = new ArrayList<>();
+        bankATransactions.add(new BankAccountTransaction(100d, BankTransactionTypes.DEBIT, "Bank A Transaction 1"));
+        bankATransactions.add(new BankAccountTransaction(200d, BankTransactionTypes.CREDIT, "Bank A Transaction 2"));
+
+        Collection<BankAccountTransaction> bankBTransactions = new ArrayList<>();
+        bankBTransactions.add(new BankAccountTransaction(1000d, BankTransactionTypes.CREDIT, "Bank B Transaction 1"));
+        bankBTransactions.add(new BankAccountTransaction(500d, BankTransactionTypes.DEBIT, "Bank B Transaction 2"));
+
+        Mockito.lenient().when(this.bankA.getTransactions(accountId, fromDate, toDate)).thenReturn(bankATransactions);
+        Mockito.lenient().when(this.bankB.getTransactions(accountId, fromDate, toDate)).thenReturn(bankBTransactions);
+
+        Map<String, Collection<BankAccountTransaction>> expectedMapping = new HashMap<>();
+        expectedMapping.put("bankA", bankATransactions);
+        expectedMapping.put("bankB", bankBTransactions);
+
+        assertEquals(this.bankService.listEveryBankAccountTransactions(accountId, fromDate, toDate), new PrintTransactionsDTO(expectedMapping));
+    }
+
+    @Test
+    @DisplayName("Should throw error when finding transactions with invalid ID")
+    public void shouldThrowErrorWhenFindingTransactionsWithInvalidId() {
+        assertThrows(InvalidBankAccountArgumentsException.class, () -> this.bankService.listEveryBankAccountTransactions(null, new Date(), new Date()));
+    }
+
+    @Test
+    @DisplayName("Should throw error when finding transactions with invalid start date")
+    public void shouldThrowErrorWhenFindingTransactionsWithStartDate() {
+        assertThrows(InvalidBankAccountArgumentsException.class, () -> this.bankService.listEveryBankAccountTransactions(1L, null, new Date()));
+    }
+
+    @Test
+    @DisplayName("Should throw error when finding transactions with invalid end date")
+    public void shouldThrowErrorWhenFindingTransactionsWithEndDate() {
+        assertThrows(InvalidBankAccountArgumentsException.class, () -> this.bankService.listEveryBankAccountTransactions(1L, new Date(), null));
+    }
 }
