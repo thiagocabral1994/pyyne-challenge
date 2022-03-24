@@ -17,7 +17,7 @@ Optional:
 
 ##### Clone source code from git
 ```
-$  git clone https://github.com/thiagocabral1994/pyyne-challenge.
+$  git clone https://github.com/thiagocabral1994/pyyne-challenge
 ```
 
 ## Run with docker-compose 
